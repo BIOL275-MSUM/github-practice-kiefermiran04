@@ -16,3 +16,140 @@ library(readxl)
 library(tidyverse)
 ```
 
+## read the finches data
+
+Have R associate the excel file with the name "finches"
+
+```{r}
+finches <- read_excel("finches_data.xlsx")
+```
+
+## print the finches tibble in the console
+
+make the data readable in the console
+
+```{r}
+finches
+```
+
+## take a quick look at all the variables in the dataset
+
+shows all the variables laid out
+
+```{r}
+glimpse(finches)
+```
+
+## histogram ---------------------------------------------------------------
+
+# histogram of beak length, grouped by survival, with labels
+
+creates a histogram so the data is more visually appealing and easier to understand.
+
+```{r}
+ggplot(
+  data = finches,                     
+  mapping = aes(x = beak_length,      
+                fill = outcome)       
+) +
+  geom_histogram(bins = 14) +         
+  facet_wrap(~ outcome, ncol = 1) +   
+  guides(fill = FALSE) +              
+  labs(
+    title = "Figure 1.",              
+    x = "Beak Length (mm)",          
+    y = "Number of Birds")   
+```
+
+## summarize ---------------------------------------------------------------
+
+# summarize the dataset by outcome (survived vs. died)
+
+Creates a simple summary of the data.
+```{r}
+beak_length_grouped_summary <- 
+  finches %>% 
+  group_by(outcome) %>% 
+  summarize(mean = mean(beak_length),
+            sd = sd(beak_length),
+            n = n()) %>% 
+  mutate(sem = sd / sqrt(n),
+         upper = mean + 1.96 * sem,
+         lower = mean - 1.96 * sem)
+```
+
+## print the results in the console
+
+show the results in a comprehesible way
+```{r}
+beak_length_grouped_summary
+```
+
+## bar chart ---------------------------------------------------------------
+
+creates a bar chart of mean beak lengths.
+
+```{r}
+ggplot(
+  data = beak_length_grouped_summary,   
+  mapping = aes(x = outcome,            
+                y = mean,               
+                fill = outcome)         
+) +
+  geom_col() +                         
+  geom_errorbar(                        
+    mapping = aes(ymin = lower,         
+                  ymax = upper),        
+    width = .3                          
+  ) +
+  guides(fill = FALSE) +                
+  labs(
+    title = "Figure 2.",                
+    x = "Survival Outcome",             
+    y = "Beak Length (mm)")
+```
+
+
+## t-test 
+
+created objects based on the 2 outcomes: died and survived.  first is died.
+
+```{r}
+beak_length_died <-
+  finches %>%
+  filter(outcome == "died") %>%  
+  pull(beak_length)               
+```
+
+## print the new object in the console
+
+show the raw data of "died".
+
+```{r}
+beak_length_died
+```
+
+## create object
+
+create objec for beak lengths for birds that survived
+
+```{r}
+beak_length_survived <-
+  finches %>% 
+  filter(outcome == "survived") %>% 
+  pull(beak_length)
+```
+
+## print the results in the console
+
+show raw data of "survived".
+```{r}
+beak_length_survived
+```
+
+## perform a two-sample t-test assuming unequal variances
+
+do a T-test using the 2 objects.
+```{r}
+t.test(beak_length_died, beak_length_survived)
+```
