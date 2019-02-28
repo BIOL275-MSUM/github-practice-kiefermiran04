@@ -1,0 +1,18 @@
+---
+title: "I h8 naming things"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## load packages
+
+loading pakages required for study
+
+```{r}
+library(readxl)   
+library(tidyverse)
+```
+
